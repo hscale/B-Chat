@@ -1,0 +1,121 @@
+<!doctype html>
+<!--
+    Author: Behnam Azizi
+    Website: cgi.sfu.ca/~bazizi
+    Description: This is a simple chat application that I made without the use of any relational databases
+
+-->
+<html>
+    <head>
+        <meta charset="utf-8" lang="en">
+        <script src="jquery.js"></script>
+        <style>
+
+            div#msg {
+                font-size: 12pt;
+                background-color: rgba(89,255,0,0.4) ;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+                padding-left: 20px;
+            }
+
+            html {
+                font-family: Ubuntu,"Times New Roman", Georgia, Serif;
+                margin-left: auto;
+                margin-right: auto;
+                width: 70%;
+                background-color: rgba(89,255,0,0.2) ;
+
+            }
+
+            #msg_field {
+                width: 100%;
+                margin-bottom: 30px;
+                text-align: center;
+                font-size: 18pt;
+
+            }
+
+            button {
+                background-color: rgba(89,255,0,0.2);
+                border-radius: 25px;
+                font-family: Ubuntu;
+                font-size: 12pt;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: rgba(0,155,0,0.5);
+            }
+
+        </style>
+        <script>
+            var local_msg_count = 0;
+            var total_msg_count = 0;
+            var local_msg_queue = [];
+
+            $(document).ready(function(){
+
+                setInterval(function(){
+                    get_msg_count_in_db();
+                    if(local_msg_count != total_msg_count){
+                        post_message("", true);
+                        local_msg_count = total_msg_count;
+                    }
+                    console.log(total_msg_count);
+                }, 3000);
+
+                document.addEventListener('keydown', function(e){
+                    if(e.keyCode == 13){
+                        e.preventDefault();
+                        post_message(document.getElementById("msg_field").value, false);
+                        $("#msg_field").val("");
+                    }
+                });
+
+                function post_message(msg_txt, load_all){
+                    $("#chat-box").html("<pre><div id=\"msg\">" + msg_txt + "</div></pre>" + document.getElementById("chat-box").innerHTML);
+                    $.ajax({
+                        url: "SimpleDB.php?msg_data=" + msg_txt,
+                        beforeSend: function( xhr ) {
+                            xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+                        }
+                    }).done(function( data ) {
+                        if (load_all) {
+                            console.log(data);
+                            $("#chat-box").html(data);
+                        }
+                    });
+                }
+            });
+
+            function get_msg_count_in_db(){
+                $.ajax({
+                    url: "SimpleDB.php?action=get_msg_count",
+                    beforeSend: function( xhr ) {
+                        xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+                    }
+                }).done(function( msg_count_in_db ) {
+                    total_msg_count = msg_count_in_db;
+                });
+            }
+
+            function clearChatData(){
+                $.ajax({
+                    url: "SimpleDB.php?action=delete&msg_data=",
+                    beforeSend: function( xhr ) {
+                        xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+                    }
+                });
+                document.getElementById("chat-box").innerHTML = "";
+            }
+        </script>
+    </head>
+    <body>
+        <h4>A noSQL chat application by Behnam Azizi</h4>
+        <textarea id="msg_field"></textarea>
+        <button onclick="clearChatData()" >Clear chat data</button>
+        <div id="chat-box"></div>
+    </body>
+
+</html>
