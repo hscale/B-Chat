@@ -92,7 +92,13 @@ class SimpleDB {
     
 }
 
+
 //======================================================================
+
+//clear cache
+session_start();
+$_SESSION = array();
+session_destroy();
 
 
 //create db object
@@ -119,9 +125,9 @@ if(isset($_GET['msg_data'])){
     }else{
         $result = "";
         foreach($sdb->getRows(1) as $msg){
-            $result = '<pre><div class=\"msg\">' . $msg[0] . '</div></pre>' . $result;
+            $result = '<div class=\"msg\">' . $msg[0] . '</div>' . $result;
         }
-        //echo $sdb->removeslashes($result);
+        echo $sdb->removeslashes($result);
     }
 }
 
