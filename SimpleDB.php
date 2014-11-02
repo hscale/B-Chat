@@ -84,13 +84,18 @@ class SimpleDB {
         return count($matches[0])/2;
     }
 
+    function removeslashes($string)
+    {
+        $string=implode("",explode("\\",$string));
+        return stripslashes(trim($string));
+    }
     
 }
 
 //======================================================================
 
 
-
+//create db object
 $sdb = new SimpleDB("chat_data");
 
 
@@ -114,10 +119,9 @@ if(isset($_GET['msg_data'])){
     }else{
         $result = "";
         foreach($sdb->getRows(1) as $msg){
-            $result = '<pre><div id=\"msg\">' . $msg[0] . '</div></pre>' . $result;
+            $result = '<pre><div class=\"msg\">' . $msg[0] . '</div></pre>' . $result;
         }
-        echo stripcslashes($result);
+        //echo $sdb->removeslashes($result);
     }
-
 }
 

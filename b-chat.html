@@ -11,13 +11,6 @@
         <script src="jquery.js"></script>
         <style>
 
-            div#msg {
-                font-size: 12pt;
-                background-color: rgba(89,255,0,0.4) ;
-                padding-bottom: 5px;
-                margin-bottom: 10px;
-                padding-left: 20px;
-            }
 
             html {
                 font-family: Ubuntu,"Times New Roman", Georgia, Serif;
@@ -49,7 +42,18 @@
             }
 
             h4, h5 {
-            	opacity: 0.6;
+                opacity: 0.6;
+            }
+
+            div.msg {
+                font-size: 12pt;
+                background-color: rgba(89,255,0,0.4);
+                float: left;
+                margin-right: auto;
+                margin-left: auto;
+                padding-left: 10%;
+                text-align: left;
+                width: 70%;
             }
 
         </style>
@@ -59,6 +63,11 @@
             var local_msg_queue = [];
 
             $(document).ready(function(){
+                get_msg_count_in_db();
+                if(local_msg_count != total_msg_count){
+                    post_message("", true);
+                    local_msg_count = total_msg_count;
+                }
 
                 setInterval(function(){
                     get_msg_count_in_db();
@@ -66,7 +75,6 @@
                         post_message("", true);
                         local_msg_count = total_msg_count;
                     }
-                    console.log(total_msg_count);
                 }, 3000);
 
                 document.addEventListener('keydown', function(e){
@@ -78,7 +86,7 @@
                 });
 
                 function post_message(msg_txt, load_all){
-                    $("#chat-box").html("<pre><div id=\"msg\">" + msg_txt + "</div></pre>" + document.getElementById("chat-box").innerHTML);
+                    $("#chat-box").html("<pre><div class=\"msg\">" + msg_txt + "</div></pre>" + document.getElementById("chat-box").innerHTML);
                     $.ajax({
                         url: "SimpleDB.php?msg_data=" + msg_txt,
                         beforeSend: function( xhr ) {
@@ -119,6 +127,7 @@
     	<h3>B-Chat</h3>
         <h4>A noSQL chat application by Behnam Azizi</h4>
         <h5>Fork the whole chat application on <a href="https://github.com/bazizi/B-Chat" target="_blank">GitHub</a></h5>
+        <p><font color="red">Note:</font> I will not be responsible for offensive or inappropriate post by other people in here</p>
         <textarea id="msg_field"></textarea>
         <button onclick="clearChatData()" >Clear chat data</button>
         <div id="chat-box"></div>
